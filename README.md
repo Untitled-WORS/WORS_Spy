@@ -1,6 +1,6 @@
 # WORS_Spy
 Spy addon for WORS
-##Chat commands##
+## Chat commands
 
 
 -  /kos [name] or target   -- adds targer or name to kos list
