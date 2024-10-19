@@ -1,0 +1,7 @@
+## Interface: 30300
+## Title: WORS Spy
+## Notes: Alerts you when a player on your KOS list is detected in combat.
+## Author: Your Name
+## Version: 1.0
+
+WORS_Spy.lua
