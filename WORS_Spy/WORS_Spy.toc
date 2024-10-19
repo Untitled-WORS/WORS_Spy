@@ -1,7 +1,7 @@
 ## Interface: 30300
 ## Title: WORS Spy
 ## Notes: Alerts you when a player on your KOS list is detected in combat.
-## Author: Untitled - Discord @Llama69420
+## Author: Untitled - Discord@Llama69420
 ## Version: 1.0
 ## SavedVariables: WORS_SpyData
 
