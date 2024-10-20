@@ -9,11 +9,19 @@ This version will auto seach while in wilderness for seen players periodically a
 
 ## Saved Variable Settings
 In directory bellow you can edit the saved variable file 
-```C:\Program Files\Ascension Launcher\resources\ascension_ptr\WTF\Account\<AccountName>\SavedVariables\WORS_Spy.lua```
+```
+C:\Program Files\Ascension Launcher\resources\ascension_ptr\WTF\Account\<AccountName>\SavedVariables\WORS_Spy.lua
+```
 ["redTime"] = 180,                               -- Time a player is highlighted red after being seen 3 min currently 
+
 ["yellowTime"] = 900,                        -- Time a player is highlighted red after being seen 15 min currently
+
 ["alertMessageDelay"] = 30,           -- Time a raid message is delayed if its for the same player 30 seconds 
+
 ["alertSoundDelay"] = 60,                -- Time a sound alert is delayed globally for all players lower if you want ears to rot 60 seconds 
+
 ["autoWildernessMode"] = true,    -- Turns on wilderness tracking (scanning seen players and alerting for any player not in raid / party disable to only use KOS list if disabled doesn't use 
+
 ["useKOSList"] = true,                       -- this gets edited when going in / out of wilderness probably dont mess with it not tested disabling recently 
+
 ["debugMode"] = false,                     -- this enables / disables debug print messages can be turned on in game using /spydebug
