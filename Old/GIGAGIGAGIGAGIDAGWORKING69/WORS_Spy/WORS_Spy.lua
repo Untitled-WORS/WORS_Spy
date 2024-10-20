@@ -115,7 +115,9 @@ local lastRaidWarningTimes = {} -- Tracks the last time a raid warning was shown
 -- Function to handle KOS alert and update the SeenPlayers list
 local function TriggerKOSAlert(playerName)
     --print("|cffff0000KOS Alert! Player " .. playerName .. " detected!|r")
+    
     local currentTime = time()
+    
     -- Play sound only if the last global sound was played over 'alertSoundDelay' seconds ago
     if currentTime - lastAlertSoundTime >= WORS_SpyData.alertSoundDelay then
         PlaySoundFile("Sound\\Interface\\RaidWarning.ogg")
@@ -127,10 +129,8 @@ local function TriggerKOSAlert(playerName)
     -- Check last raid warning time for the specific player
     if not lastRaidWarningTimes[playerName] or currentTime - lastRaidWarningTimes[playerName] >= WORS_SpyData.alertMessageDelay then
         -- Show raid warning message for this player if not suppressed
-        --RaidNotice_AddMessage(RaidWarningFrame, "KOS Alert! " .. playerName .. " detected!", ChatTypeInfo["RAID_WARNING"])
-		RaidNotice_AddMessage(RaidWarningFrame, "|TInterface\\TargetingFrame\\UI-RaidTargetingIcon_8:24:24:0:10|t KOS Alert! " .. playerName .. " detected! |TInterface\\TargetingFrame\\UI-RaidTargetingIcon_8:24:24:0:10|t", ChatTypeInfo["RAID_WARNING"])
-
-		lastRaidWarningTimes[playerName] = currentTime
+        RaidNotice_AddMessage(RaidWarningFrame, "KOS Alert! " .. playerName .. " detected!", ChatTypeInfo["RAID_WARNING"])
+        lastRaidWarningTimes[playerName] = currentTime
 		print("|cffff0000KOS Alert! Player " .. playerName .. " detected!|r")
     else
         debugPrint("Raid warning message suppressed for " .. playerName .. ".")
@@ -141,29 +141,8 @@ local function TriggerKOSAlert(playerName)
 end
 
 
--- Function to handle in visable range alart and update the SeenPlayers list
-local function TriggerRangeAlert(playerName)
-    local currentTime = time()
-    -- Play sound only if the last global sound was played over 'alertSoundDelay' seconds ago
-    if currentTime - lastAlertSoundTime >= WORS_SpyData.alertSoundDelay then
-        PlaySoundFile("Sound\\Interface\\RaidWarning.ogg")
-        lastAlertSoundTime = currentTime
-    else
-        debugPrint("Global alert sound suppressed for " .. playerName .. ".")
-    end
-    -- Check last raid warning time for the specific player
-    
-    -- Show raid warning message for this player if not suppressed
-	--RaidNotice_AddMessage(RaidWarningFrame, "In Range! " .. playerName .. " detected!", ChatTypeInfo["RAID_WARNING"])
-    RaidNotice_AddMessage(RaidWarningFrame, "|TInterface\\TargetingFrame\\UI-RaidTargetingIcon_1:24:24:0:10|t In Range!! " .. playerName .. " detected! |TInterface\\TargetingFrame\\UI-RaidTargetingIcon_1:24:24:0:10|t", ChatTypeInfo["RAID_WARNING"])
 
-	lastRaidWarningTimes[playerName] = currentTime
-	print("|cffff0000In Range Alert! Player " .. playerName .. " detected!|r")
-    -- Update or add the player in the SeenPlayers list
-    SeenPlayers[playerName] = currentTime
-end
-
-
+-- Function to check and save player level
 -- Function to check and save a player's level
 local function CheckAndSavePlayerLevel(unitID, playerName)
     local playerLevel = UnitLevel(unitID)  -- Get the player's level
@@ -201,24 +180,28 @@ end
 -- Function to update the seen players list display
 local function UpdateSeenPlayersDisplay()
     local currentTime = time()
+    
     -- Sort players by last seen time (most recent at the top)
     local sortedPlayers = {}
     for playerName, lastSeen in pairs(SeenPlayers) do
         table.insert(sortedPlayers, { name = playerName, lastSeen = lastSeen })
     end
     table.sort(sortedPlayers, function(a, b) return a.lastSeen > b.lastSeen end)
+
     -- Update or create UI elements for each player as buttons
     for i, playerInfo in ipairs(sortedPlayers) do
         local playerName = playerInfo.name
         local elapsedTime = currentTime - playerInfo.lastSeen
         local level = WORS_SpyData.playerLevels[playerName] or "???"
         local button = playerButtons[i]
+
         -- Create a button if it doesn't exist yet
         if not button then
             button = CreateFrame("Button", nil, WORS_SpyFrame, "BackdropTemplate") -- Ensure BackdropTemplate is used
             button:SetSize(150, 40)
             button:SetNormalFontObject("GameFontNormal")
             button:SetHighlightFontObject("GameFontNormal")
+
             -- Apply custom background and border
             button:SetBackdrop({
                 bgFile = "Interface\\WORS\\OldSchoolBackground2", -- Fully opaque background file
@@ -284,12 +267,14 @@ end
 local function IsNPC(name)
     -- Convert the given name to lowercase
     local lowerName = string.lower(name)
+
     for _, npcName in ipairs(npcList) do
         -- Convert npcName to lowercase and compare
         if string.lower(npcName) == lowerName then
             return true
         end
     end
+
     return false
 end
 
@@ -299,6 +284,8 @@ local function IsPlayerByNameCombatLog(name)
     return name and not IsNPC(name)  -- If it's not an NPC, it's assumed to be a player
 end
 
+-- Your existing OnCombatLogEvent function
+-- List of NPC names
 
 -- Function to check if a name is an NPC
 local function IsNPC(name)
@@ -330,28 +317,10 @@ function IsInPartyOrRaid(name)
             end
         end
     end
+
     return false
 end
 
-
-local checkInterval = 30 -- Default interval in seconds (changeable)
-local checkTimer = 0 -- Timer to track the elapsed time
-
--- Function to check if seen players are in render distance
-local function CheckSeenPlayersInRange()
-    for playerName, _ in pairs(WORS_SpyData.playerLevels) do
-        -- Check if the player exists and is a player
-        if UnitExists(playerName) and UnitIsPlayer(playerName) then
-            if UnitInRange(playerName) and UnitIsVisible(playerName) then
-                print(playerName .. " is in visible range!")
-                
-				TriggerRangeAlert(playerName) -- Trigger KOS alert for the player in range
-            else
-                print(playerName .. " is out of visible range.")
-            end
-        end
-    end
-end
 
 
 -- Updated OnCombatLogEvent function
@@ -505,23 +474,10 @@ frame:SetScript("OnEvent", function(self, event, ...)
             -- Add your custom logic here
             if WORS_SpyData.autoWildernessMode == true then  -- Use == for comparison
                 print("Spy: Wilderness mode Active!")
-				WORS_SpyData.useKOSList = false
-				print("useKOSList t/f: " .. tostring(WORS_SpyData.useKOSList))
-			end
+            end
         elseif WORS_SpyData.autoWildernessMode == true then  -- Use 'and' instead of '&&'
             print("Spy: Wilderness mode Deactivated!")
-			WORS_SpyData.useKOSList = true
-			print("useKOSList t/f: " .. tostring(WORS_SpyData.useKOSList))
         end
-    end
-end)
-
--- OnUpdate logic for periodic checks
-frame:SetScript("OnUpdate", function(self, elapsed)
-    checkTimer = checkTimer + elapsed
-    if checkTimer >= checkInterval and not WORS_SpyData.useKOSList then
-        CheckSeenPlayersInRange()
-        checkTimer = 0 -- Reset the timer
     end
 end)
 
