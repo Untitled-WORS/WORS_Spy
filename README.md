@@ -3,9 +3,11 @@ Spy Addon for WORS
 This version will auto seach while in wilderness for seen players periodically and checks combat / target / mouse over.  I think long term the KOS list functionality will kind of fall off this as i don't think its needed given pvp is always going to be in wilderness check everyone but in party maybe even change to a whitelist but will keep it in for now 
 
 ## Chat Commands 
-/kos <name> or target --add to kos list 
-/kosdel <name> -- remove from kos list
-/spydebug -- prints ALOT of debug lines
+/kos name or target  --add to kos list 
+
+/kosdel name         -- remove from kos list
+
+/spydebug            -- prints ALOT of debug lines
 
 ## Saved Variable Settings
 In directory bellow you can edit the saved variable file 
